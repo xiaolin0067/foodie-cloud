@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>foodie-item-api</artifactId>
+    <artifactId>foodie-user-api</artifactId>
 
     <dependencies>
         <dependency>
@@ -21,7 +21,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>foodie-item-pojo</artifactId>
+            <artifactId>foodie-user-pojo</artifactId>
             <version>${project.version}</version>
         </dependency>
 
