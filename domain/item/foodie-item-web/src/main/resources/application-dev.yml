@@ -1,0 +1,31 @@
+server:
+  port: 10001
+
+spring:
+  datasource:
+    # 新版本必须指定是否使用ssl连接：&useSSL=false
+    url: jdbc:mysql://192.168.3.26:3306/foodie-shop-dev?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    username: root
+    password: 123456
+  redis:
+    # 单节点配置方式
+    # database设置使用哪个数据库，在redis-cli中使用命令select 1来使用该库
+    database: 0
+    host: 192.168.3.26
+    port: 6379
+    password: 123456
+    # sentinel 哨兵配置方式
+#    database: 1
+#    password: 123456
+#    sentinel:
+#      master: mymaster-nick-name
+      # 注意端口为哨兵进程的端口
+#      nodes: 192.168.3.26:26379,192.168.3.17:26379,192.168.3.27:26379
+    # cluster 集群配置方式
+#    password: 123456
+#    cluster:
+#      nodes: 192.168.3.16:6379,192.168.3.17:6379,192.168.3.26:6379,192.168.3.27:6379
+
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl    # 开启查询SQL日志
