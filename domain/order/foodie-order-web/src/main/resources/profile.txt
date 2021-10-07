@@ -1,0 +1,18 @@
+多环境配置梳理
+1. 数据源配置-数据库
+    1.1 url根据部署情况修改ip，集群或者分布式系统一定要使用内网IP
+    1.2 用户名与密码根据实际情况修改，可统一为root也可单个服务增加用户名和密码访问特定的数据库
+2. mybatis查询SQL日志打印：dev,test-可以打印, prod-无需打印
+3. 修改图片保存目录、图片服务请求路径配置、config配置文件修改为prod
+    file.imageUserFaceLocation=/workspaces/images/foodie/faces
+    file.imageServerUrl=http://192.168.3.16:8088/foodie-dev-api/foodie/faces
+4. 支付中心回调天天货地址，回调通知的url
+
+打包方式：jar：服务化概念，war：应用程序概念
+
+修改/tomcat/conf/context.xml
+在<Context>中增加
+<CookieProcessor className="org.apache.tomcat.util.http.LegacyCookieProcessor" />
+可修改Tomcat的cookie处理器
+解决不合法的域报错[.z.mukewang.com作为cookie域名报错，而z.mukewang.com则不会]，IllegalArgumentException: An invalid domain [*] was specified for this cookie
+

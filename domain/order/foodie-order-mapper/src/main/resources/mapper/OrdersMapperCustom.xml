@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zlin.order.mapper.OrdersMapperCustom">
+
+    <!--  返回数据映射，jdbcType属性可省略，column对应SQL字段，property对应VO字段  -->
+    <resultMap id="myOrderVO" type="com.zlin.order.pojo.vo.MyOrdersVO">
+        <id column="orderId" property="orderId" />
+        <result column="createdTime" property="createdTime" />
+        <result column="payMethod" property="payMethod" />
+        <result column="realPayAmount" property="realPayAmount" />
+        <result column="postAmount" property="postAmount" />
+        <result column="isComment" property="isComment" />
+        <result column="orderStatus" property="orderStatus" />
+
+        <!--
+        select属性为使用子查询，值为子查询ID名
+        column为子查询参数，值为父查询的property值
+        -->
+        <collection property="subOrderItemList"
+                    select="getOrderItems"
+                    column="orderId"
+                    ofType="com.zlin.order.pojo.vo.MySubOrderItemVO">
+            <result column="itemId" property="itemId" />
+            <result column="itemImg" property="itemImg" />
+            <result column="itemName" property="itemName" />
+            <result column="itemSpecName" property="itemSpecName" />
+            <result column="buyCounts" property="buyCounts" />
+            <result column="price" property="price" />
+        </collection>
+    </resultMap>
+
+    <select id="getOrderItems" parameterType="String" resultType="com.zlin.order.pojo.vo.MySubOrderItemVO">
+        SELECT
+        oi.item_id as itemId,
+        oi.item_name as itemName,
+        oi.item_img as itemImg,
+        oi.item_spec_name as itemSpecName,
+        oi.buy_counts as buyCounts,
+        oi.price as price
+        FROM
+        order_items oi
+        WHERE
+        oi.order_id = #{orderId}
+    </select>
+
+    <select id="queryMyOrders" resultMap="myOrderVO" parameterType="Map">
+        SELECT
+        od.id as orderId,
+        od.created_time as createdTime,
+        od.pay_method as payMethod,
+        od.real_pay_amount as realPayAmount,
+        od.post_amount as postAmount,
+        os.order_status as orderStatus,
+        od.is_comment as isComment
+        FROM
+        orders od
+        LEFT JOIN
+        order_status os
+        on od.id = os.order_id
+        WHERE
+        od.user_id = #{paramsMap.userId}
+        AND
+        od.is_delete = 0
+        <if test="paramsMap.orderStatus != null">
+            and os.order_status = #{paramsMap.orderStatus}
+        </if>
+        ORDER BY
+        od.updated_time ASC
+    </select>
+
+    <!--  包含子列表时PageHelper分页插件会分页错误  -->
+    <select id="queryMyOrders_OLD" resultMap="myOrderVO" parameterType="Map">
+        SELECT
+        od.id as orderId,
+        od.created_time as createdTime,
+        od.pay_method as payMethod,
+        od.real_pay_amount as realPayAmount,
+        od.post_amount as postAmount,
+        os.order_status as orderStatus,
+        od.is_comment as isComment,
+        oi.item_id as itemId,
+        oi.item_name as itemName,
+        oi.item_img as itemImg,
+        oi.item_spec_name as itemSpecName,
+        oi.buy_counts as buyCounts,
+        oi.price as price
+        FROM
+        orders od
+        LEFT JOIN
+        order_status os
+        on od.id = os.order_id
+        LEFT JOIN
+        order_items oi
+        on od.id = oi.order_id
+        WHERE
+        od.user_id = #{paramsMap.userId}
+        AND
+        od.is_delete = 0
+        <if test="paramsMap.orderStatus != null">
+            and os.order_status = #{paramsMap.orderStatus}
+        </if>
+        ORDER BY
+        od.updated_time ASC
+    </select>
+
+    <select id="getMyOrderStatusCounts" parameterType="Map" resultType="int">
+        SELECT
+        count(1)
+        FROM
+        orders o
+        LEFT JOIN
+        order_status os
+        on
+        o.id = os.order_id
+        WHERE
+        o.user_id = #{paramsMap.userId}
+        AND
+        os.order_status = #{paramsMap.orderStatus}
+        <if test="paramsMap.isComment != null">
+            and o.is_comment = #{paramsMap.isComment}
+        </if>
+    </select>
+
+    <select id="getMyOrderTrend" parameterType="Map" resultType="com.zlin.order.pojo.OrderStatus">
+        SELECT
+            os.order_id as orderId,
+            os.order_status as orderStatus,
+            os.created_time as createdTime,
+            os.pay_time as payTime,
+            os.deliver_time as deliverTime,
+            os.success_time as successTime,
+            os.close_time as closeTime,
+            os.comment_time as commentTime
+        FROM
+          orders o
+        LEFT JOIN
+          order_status os
+        on
+          o.id = os.order_id
+        WHERE
+          o.is_delete = 0
+        AND
+          o.user_id = #{paramsMap.userId}
+        AND
+          os.order_status in (20, 30, 40)
+        ORDER BY
+          os.order_id
+        DESC
+    </select>
+
+</mapper>
