@@ -13,9 +13,9 @@ import com.zlin.order.pojo.vo.OrderStatusCountsVO;
 import com.zlin.order.service.center.MyOrderService;
 import com.zlin.pojo.PagedGridResult;
 import com.zlin.pojo.Result;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
@@ -28,7 +28,7 @@ import java.util.Map;
  * @author zlin
  * @date 20201226
  */
-@Service
+@RestController
 public class MyOrderServiceImpl implements MyOrderService {
 
     @Resource

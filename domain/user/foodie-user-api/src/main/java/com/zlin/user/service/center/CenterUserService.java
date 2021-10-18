@@ -2,12 +2,14 @@ package com.zlin.user.service.center;
 
 import com.zlin.user.pojo.Users;
 import com.zlin.user.pojo.bo.center.CenterUserBO;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * @author zlin
  * @date 20210121
  */
+@FeignClient("foodie-user-service")
 @RequestMapping("center-user-api")
 public interface CenterUserService {
 

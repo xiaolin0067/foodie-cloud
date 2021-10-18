@@ -4,12 +4,14 @@ import com.zlin.order.pojo.Orders;
 import com.zlin.order.pojo.vo.OrderStatusCountsVO;
 import com.zlin.pojo.PagedGridResult;
 import com.zlin.pojo.Result;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * @author zlin
  * @date 20201226
  */
+@FeignClient("foodie-order-service")
 @RequestMapping("myorder-api")
 public interface MyOrderService {
 

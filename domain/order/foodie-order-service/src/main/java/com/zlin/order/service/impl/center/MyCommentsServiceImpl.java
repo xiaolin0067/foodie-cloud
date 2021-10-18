@@ -1,6 +1,7 @@
 package com.zlin.order.service.impl.center;
 
 import com.zlin.enums.YesOrNo;
+import com.zlin.item.service.ItemCommentsService;
 import com.zlin.order.mapper.OrderItemsMapper;
 import com.zlin.order.mapper.OrderStatusMapper;
 import com.zlin.order.mapper.OrdersMapper;
@@ -11,12 +12,9 @@ import com.zlin.order.pojo.bo.center.OrderItemsCommentBO;
 import com.zlin.order.service.center.MyCommentsService;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -28,23 +26,20 @@ import java.util.Map;
  * @author zlin
  * @date 20210214
  */
-@Service
+@RestController
 public class MyCommentsServiceImpl implements MyCommentsService {
 
     @Resource
     private OrderItemsMapper orderItemsMapper;
-
-    @Autowired
-    private LoadBalancerClient client;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Resource
     private OrdersMapper ordersMapper;
 
     @Resource
     private OrderStatusMapper orderStatusMapper;
+
+    @Autowired
+    private ItemCommentsService itemCommentsService;
 
     @Resource
     private Sid sid;
@@ -80,12 +75,7 @@ public class MyCommentsServiceImpl implements MyCommentsService {
         Map<String, Object> map = new HashMap<>(2);
         map.put("userId", userId);
         map.put("commentList", commentList);
-
-        ServiceInstance instance = client.choose("FOODIE-ITEM-SERVICE");
-        String url = String.format("http://%s:%s/item-comments-api/saveOrderComments",
-                instance.getHost(),
-                instance.getPort());
-        restTemplate.postForLocation(url, map);
+        itemCommentsService.saveComments(map);
 
         // 2.修改订单状态为已评价 orders
         Orders order = new Orders();

@@ -2,7 +2,7 @@ package com.zlin.order.service.center;
 
 import com.zlin.order.pojo.OrderItems;
 import com.zlin.order.pojo.bo.center.OrderItemsCommentBO;
-import com.zlin.pojo.PagedGridResult;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,6 +11,7 @@ import java.util.List;
  * @author zlin
  * @date 20210214
  */
+@FeignClient("foodie-order-service")
 @RequestMapping("order-comments-api")
 public interface MyCommentsService {
 

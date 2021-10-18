@@ -2,6 +2,7 @@ package com.zlin.order.controller.center;
 
 import com.zlin.controller.BaseController;
 import com.zlin.enums.YesOrNo;
+import com.zlin.item.service.ItemCommentsService;
 import com.zlin.order.pojo.OrderItems;
 import com.zlin.order.pojo.Orders;
 import com.zlin.order.pojo.bo.center.OrderItemsCommentBO;
@@ -14,11 +15,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -39,10 +37,7 @@ public class MyCommentsController extends BaseController {
     private MyOrderService myOrderService;
 
     @Autowired
-    private LoadBalancerClient client;
-
-    @Autowired
-    private RestTemplate restTemplate;
+    private ItemCommentsService itemCommentsService;
 
     @ApiOperation(value = "查询未评价订单商品列表", notes = "查询未评价订单商品列表", httpMethod = "POST")
     @PostMapping("pending")
@@ -105,15 +100,7 @@ public class MyCommentsController extends BaseController {
         if (pageSize == null) {
             pageSize = PAGE_SIZE;
         }
-        ServiceInstance userInstance = client.choose("FOODIE-ITEM-SERVICE");
-        String getAddressUrl = String.format("http://%s:%s/item-comments-api/myComments?userId=%s&page=%s&pageSize=%s",
-                userInstance.getHost(),
-                userInstance.getPort(),
-                userId,
-                page,
-                pageSize
-        );
-        PagedGridResult grid = restTemplate.getForObject(getAddressUrl, PagedGridResult.class);
+        PagedGridResult grid = itemCommentsService.queryMyComments(userId, page, pageSize);
         return Result.ok(grid);
     }
 

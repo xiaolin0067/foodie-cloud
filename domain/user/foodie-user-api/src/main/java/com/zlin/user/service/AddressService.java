@@ -3,6 +3,7 @@ package com.zlin.user.service;
 
 import com.zlin.user.pojo.UserAddress;
 import com.zlin.user.pojo.bo.AddressBO;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
  * @author zlin
  * @date 20201225
  */
+@FeignClient("foodie-user-service")
 @RestController("address-api")
 public interface AddressService {
 

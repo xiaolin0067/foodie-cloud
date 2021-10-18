@@ -3,12 +3,14 @@ package com.zlin.order.service;
 import com.zlin.order.pojo.OrderStatus;
 import com.zlin.order.pojo.bo.PlaceOrderBO;
 import com.zlin.order.pojo.vo.OrderVO;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * @author zlin
  * @date 20201226
  */
+@FeignClient("foodie-order-service")
 @RequestMapping("order-api")
 public interface OrderService {
 

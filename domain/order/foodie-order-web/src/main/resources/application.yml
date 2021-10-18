@@ -17,6 +17,9 @@ server:
 spring:
   application:
     name: foodie-order-service
+  main:
+    # Feign - 当Bean名字一样时，允许覆盖注册
+    allow-bean-definition-overriding: true
   profiles:
     active: dev
   datasource:                                         # 数据源的相关配置

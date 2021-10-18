@@ -2,12 +2,14 @@ package com.zlin.user.service;
 
 import com.zlin.user.pojo.Users;
 import com.zlin.user.pojo.bo.UserBO;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * @author zlin
  * @date 20201219
  */
+@FeignClient("foodie-user-service")
 @RequestMapping("user-api")
 public interface UserService {
 

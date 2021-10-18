@@ -29,3 +29,30 @@ spring:
 mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl    # 开启查询SQL日志
+
+# Ribbon全局配置
+ribbon:
+  ConnectTimeout: 1000
+  ReadTimeout: 3000
+
+# Ribbon指定服务配置超时判定，优先级高于全局配置
+foodie-user-service:
+  ribbon:
+    ConnectTimeout: 1000
+    ReadTimeout: 3000
+    MaxAutoRetries: 2                      # 每台机器最大重试次数
+    MaxAutoRetriesNextServer: 2            # 可以再重试几台机器
+    OkToRetryOnAllOperations: true         # 在所有HTTP Method进行重试 默认为false，仅在GET类型上重试。谨慎开启，要确保接口实现幂等性
+
+# Feign的超时配置，优先级高于Ribbon
+feign:
+  client:
+    config:
+      # 全局默认配置
+      default:
+        connectTimeout: 1000
+        readTimeout: 5000
+      # 指定服务超时配置，优先级高于全局配置
+      foodie-user-service:
+        connectTimeout: 1000
+        readTimeout: 5000
