@@ -2,7 +2,7 @@ package com.zlin.order.controller.center;
 
 import com.zlin.controller.BaseController;
 import com.zlin.enums.YesOrNo;
-import com.zlin.item.service.ItemCommentsService;
+import com.zlin.order.fallback.itemservice.ItemCommentsFeignClient;
 import com.zlin.order.pojo.OrderItems;
 import com.zlin.order.pojo.Orders;
 import com.zlin.order.pojo.bo.center.OrderItemsCommentBO;
@@ -37,7 +37,8 @@ public class MyCommentsController extends BaseController {
     private MyOrderService myOrderService;
 
     @Autowired
-    private ItemCommentsService itemCommentsService;
+//    private ItemCommentsService itemCommentsService;
+    private ItemCommentsFeignClient itemCommentsService;
 
     @ApiOperation(value = "查询未评价订单商品列表", notes = "查询未评价订单商品列表", httpMethod = "POST")
     @PostMapping("pending")
@@ -92,7 +93,7 @@ public class MyCommentsController extends BaseController {
             @RequestParam(value = "pageSize", required = false) Integer pageSize) {
 
         if (StringUtils.isBlank(userId)) {
-            return Result.errorMsg(null);
+            return Result.errorMsg("用户ID为空");
         }
         if (page == null) {
             page = 1;

@@ -1,5 +1,9 @@
 package com.zlin.order;
 
+import com.zlin.item.service.ItemService;
+import com.zlin.order.fallback.itemservice.ItemCommentsFeignClient;
+import com.zlin.user.service.AddressService;
+import com.zlin.user.service.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -19,10 +23,18 @@ import tk.mybatis.spring.annotation.MapperScan;
 @ComponentScan(basePackages = {"com.zlin", "org.n3r.idworker"})
 @EnableDiscoveryClient
 @EnableScheduling
-@EnableFeignClients(basePackages = {
-        "com.zlin.item.service",
-        "com.zlin.user.service"
-})
+@EnableFeignClients(
+//        basePackages = {
+//                "com.zlin.item.service",
+//                "com.zlin.user.service"
+//        }
+        clients = {
+                ItemCommentsFeignClient.class,
+                ItemService.class,
+                UserService.class,
+                AddressService.class
+        }
+)
 public class OrderApp {
 
     public static void main(String[] args) {

@@ -1,7 +1,7 @@
 package com.zlin.order.service.impl.center;
 
 import com.zlin.enums.YesOrNo;
-import com.zlin.item.service.ItemCommentsService;
+import com.zlin.order.fallback.itemservice.ItemCommentsFeignClient;
 import com.zlin.order.mapper.OrderItemsMapper;
 import com.zlin.order.mapper.OrderStatusMapper;
 import com.zlin.order.mapper.OrdersMapper;
@@ -39,7 +39,8 @@ public class MyCommentsServiceImpl implements MyCommentsService {
     private OrderStatusMapper orderStatusMapper;
 
     @Autowired
-    private ItemCommentsService itemCommentsService;
+    //    private ItemCommentsService itemCommentsService;
+    private ItemCommentsFeignClient itemCommentsService;
 
     @Resource
     private Sid sid;
