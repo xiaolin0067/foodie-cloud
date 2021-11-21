@@ -56,3 +56,13 @@ feign:
       foodie-user-service:
         connectTimeout: 1000
         readTimeout: 5000
+# 开启actuator端点
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  security: false
