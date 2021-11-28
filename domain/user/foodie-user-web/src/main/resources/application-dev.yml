@@ -4,9 +4,11 @@ server:
 spring:
   datasource:
     # 新版本必须指定是否使用ssl连接：&useSSL=false
-    url: jdbc:mysql://192.168.3.26:3306/foodie-shop-dev?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+#    url: jdbc:mysql://192.168.3.26:3306/foodie-shop-dev?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+#    password: 123456
     username: root
-    password: 123456
+    url: ${mariadb.url}
+    password: ${mariadb.password}
   redis:
     # 单节点配置方式
     # database设置使用哪个数据库，在redis-cli中使用命令select 1来使用该库
@@ -30,15 +32,15 @@ mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl    # 开启查询SQL日志
 # 开启actuator端点
-management:
-  endpoint:
-    health:
-      show-details: always
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-  security: false
+#management:
+#  endpoint:
+#    health:
+#      show-details: always
+#  endpoints:
+#    web:
+#      exposure:
+#        include: '*'
+#  security: false
 
 hystrix:
   command:

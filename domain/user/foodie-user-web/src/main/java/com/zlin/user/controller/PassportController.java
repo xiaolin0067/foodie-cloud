@@ -6,6 +6,7 @@ import com.zlin.controller.BaseController;
 import com.zlin.enums.CacheKey;
 import com.zlin.pojo.Result;
 import com.zlin.pojo.ShopCartBO;
+import com.zlin.user.config.UserAppConfig;
 import com.zlin.user.pojo.Users;
 import com.zlin.user.pojo.bo.UserBO;
 import com.zlin.user.pojo.vo.UsersVO;
@@ -17,14 +18,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -36,17 +38,21 @@ import java.util.stream.Collectors;
  * @date 20201219
  */
 @Api(value = "注册登录", tags = {"用于注册登录的相关接口"})
+@Slf4j
 @RestController
 @RequestMapping("passport")
 public class PassportController extends BaseController {
 
     private final static Logger logger = LoggerFactory.getLogger(PassportController.class);
 
-    @Resource
+    @Autowired
     UserService userService;
 
-    @Resource
+    @Autowired
     private RedisOperator redisOperator;
+
+    @Autowired
+    private UserAppConfig userAppConfig;
 
     /**
      * 检查用户名是否存在
@@ -78,6 +84,10 @@ public class PassportController extends BaseController {
     @ApiOperation(value = "用户注册", notes = "用户注册", httpMethod = "POST")
     @PostMapping("/regist")
     public Result regist(@RequestBody UserBO userBO, HttpServletRequest request, HttpServletResponse response) {
+        if (userAppConfig.isDisableRegistration()) {
+            log.warn("配置禁用注册 - {}", userBO.getUsername());
+            return Result.errorMsg("当前注册用户过多，请稍后再试");
+        }
         String username = userBO.getUsername();
         String password = userBO.getPassword();
         String confirmPassword = userBO.getConfirmPassword();

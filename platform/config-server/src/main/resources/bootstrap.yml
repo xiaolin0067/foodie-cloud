@@ -1,0 +1,5 @@
+encrypt:
+  key: superNewBee
+
+# POST http://localhost:60001/encrypt
+# POST http://localhost:60001/decrypt
