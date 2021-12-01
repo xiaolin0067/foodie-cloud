@@ -1,0 +1,5 @@
+# 刷新配置
+POST http://localhost:10002/actuator/refresh
+
+# 消息总线 - BUS
+两大应用场景：1、配置变更通知，2、自定义消息广播
