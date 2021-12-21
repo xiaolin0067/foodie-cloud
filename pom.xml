@@ -34,6 +34,7 @@
         <module>platform/hystrix-dashboard</module>
         <module>platform/config-server</module>
         <module>platform/gateway</module>
+        <module>platform/zipkin-server</module>
     </modules>
 
     <packaging>pom</packaging>

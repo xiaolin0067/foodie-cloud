@@ -25,6 +25,16 @@ spring:
 #    password: 123456
 #    cluster:
 #      nodes: 192.168.3.16:6379,192.168.3.17:6379,192.168.3.26:6379,192.168.3.27:6379
+  # 链路追踪
+  zipkin:
+    discovery-client-enabled: true
+    base-url: http://ZIPKIN-SERVER/
+    locator:
+      discovery:
+        enabled: true
+  sleuth:
+    sampler:
+      probability: 1
 
 mybatis:
   configuration:
