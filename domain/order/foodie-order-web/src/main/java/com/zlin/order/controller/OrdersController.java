@@ -5,11 +5,13 @@ import com.zlin.enums.CacheKey;
 import com.zlin.enums.OrderStatusEnum;
 import com.zlin.enums.PayMethod;
 import com.zlin.order.pojo.OrderStatus;
+import com.zlin.order.pojo.bo.OrderStatusCheckBO;
 import com.zlin.order.pojo.bo.PlaceOrderBO;
 import com.zlin.order.pojo.bo.SubmitOrderBO;
 import com.zlin.order.pojo.vo.MerchantOrdersVO;
 import com.zlin.order.pojo.vo.OrderVO;
 import com.zlin.order.service.OrderService;
+import com.zlin.order.stream.CheckOrderTopic;
 import com.zlin.pojo.Result;
 import com.zlin.pojo.ShopCartBO;
 import com.zlin.utils.CookieUtils;
@@ -20,7 +22,9 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,6 +58,9 @@ public class OrdersController extends BaseController {
 
     @Resource
     private RedisOperator redisOperator;
+
+    @Autowired
+    private CheckOrderTopic orderStatusProducer;
 
     @ApiOperation(value = "获取订单token", notes = "获取订单token", httpMethod = "POST")
     @PostMapping("/token")
@@ -97,6 +104,13 @@ public class OrdersController extends BaseController {
         String currentShopCartJson = JsonUtils.objectToJson(shopCartList);
         redisOperator.set(userShopCartCacheKey, currentShopCartJson);
         CookieUtils.setCookie(request, response, CacheKey.SHOP_CART.value, currentShopCartJson, true);
+
+        // stream延迟队列，一天后检查订单状态
+        orderStatusProducer.output().send(
+                MessageBuilder.withPayload(new OrderStatusCheckBO(order.getOrderId()))
+                        .setHeader("x-delay", 86400000 + 300000)
+                        .build()
+        );
 
         // 3、向支付中心发送当前订单，用于保存支付中心的订单数据
         MerchantOrdersVO merchantOrdersVO = order.getMerchantOrdersVO();

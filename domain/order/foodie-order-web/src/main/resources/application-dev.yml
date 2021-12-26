@@ -35,6 +35,20 @@ spring:
   sleuth:
     sampler:
       probability: 1
+  # stream 延迟消息配置
+  cloud:
+    stream:
+      bindings:
+        order-status-consumer:
+          destination: order-status-topic
+          group: order-status-group
+        order-status-producer:
+          destination: order-status-topic
+      rabbit:
+        bindings:
+          order-status-producer:
+            producer:
+              delayed-exchange: true
 
 mybatis:
   configuration:
