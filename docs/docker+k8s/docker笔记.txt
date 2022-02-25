@@ -1,0 +1,81 @@
+#安装
+curl -fsSL get.docker.com -o get-docker.sh
+sh get-docker.sh --mirror Aliyun
+
+# docker启停
+systemctl start docker
+
+# hello world
+docker run hello-word
+# 查看进程
+docker ps
+docker ps -a
+
+# 搜索镜像
+docker search redis
+# 拉取镜像
+docker pull redis
+# docker pull bitnami/redis
+# 查看本地有哪些镜像
+docker image ls -a
+# 删除镜像
+docker rmi ${image id}
+
+# -c -m -memory-swap -blkio-weight 控制容器在资源紧张时可获得资源的比例
+# -d 代表后台执行 如果没有-d， 那么当前命令行退出之后，docker 容器也退出。
+# -p 5672:5672 port 端口映射 将宿主机的端口和容器端口关联。客户端可以通过宿主机的IP:PORT 访问容器
+# --name redis 容器的名称 不同容器的名称不能相同
+# 最后一个redis 镜像的名称
+docker run -itd -p 5672:5672 [--name redis] redis
+# 查看容器列表
+docker container ls -a
+# 进入容器bash
+docker exec -it ${container id}/${container name} bash/redis-cli
+# 查看容器日志
+docker logs -f ${container id}/${container name}
+# 开启&停止&杀死容器
+docker start/stop/kill ${container id}/${container name}
+# 暂停/继续容器
+docker pause/unpause
+# 删除容器
+docker rm [-f] ${container id}
+
+# Dockerfile
+FROM [使用的基础镜像]
+MAINTAINER [备注]
+RUN [镜像启动后执行命令，都会执行]
+COPY [制作镜像时执行，将当前制作环境中的文件复制到容器里]
+ADD [与COPY类似，但ADD在复制文件时会将压缩文件解压后放到容器里，且源文件可为链接]
+EXPOSE [暴露容器的端口，指定了该值启动容器时带上-P会在服务器上随机指定端口与改端口绑定以暴露容器端口。但不指定该值时也可运行时使用-p绑定服务器与容器的端口，故该配置不常用]
+VOLUME [绑定容器与服务器目录的绑定，可在启动时配置-e来指定]
+ENTRYPOINT [若指定了多个ENTRYPOINT则只会执行最后一条]
+RUN [容器启动时不加参数才会执行，若指定了ENTRYPOINT则该配置会作为参数传递给ENTRYPOINT]
+
+--------------------------------
+#Owned by zlin
+FROM debian
+MAINTAINER testNote
+RUN mkdir test1
+RUN mkdir test2
+COPY test3
+ADD test4.tar.gz .
+ENTRYPOINT ["/bin/sh"]
+CMD ["-c","ls -l"]
+--------------------------------
+
+# 部署微服务
+# 启动rabbitmq
+docker run -d --name myrabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:management
+docker run -d -p 6379:6379 --name myredis redis redis-server
+docker run -d --name mymysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql
+
+制作registry镜像
+vim Dockerfile
+
+FROM java:8
+ADD registry-center-1.0-SNAPSHOT.jar registry-center-1.0-SNAPSHOT.jar
+ENTRYPOINT ["java","-jar", "registry-center-1.0-SNAPSHOT.jar"]
+
+docker build -t myregistry .
+启动
+docker run -d -p 20000:20000 --name myregistry myregistry
