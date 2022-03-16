@@ -4,23 +4,18 @@ server:
 spring:
   application:
     name: config-server
-  ## rabbitMQ用于Bus推送
-#  rabbitmq:
-#    host: localhost
-#    port: 5672
-#    username: guest
-#    password: guest
   cloud:
     config:
       server:
-        # 属性重载
+        # 属性重载，git上的配置将被覆盖
         overrides:
-          test: mytest
+          test: localConfigFileValue
         git:
           uri: https://gitee.com/pangzl/foodie-cloud-config.git
           force-pull: true
           # 将配置文件放到接入方服务名称对应文件夹下面
           search-paths: '{application}'
+          # 可为仓库设置用户名密码以加密
           # username:
           # password:
 

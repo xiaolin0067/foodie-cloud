@@ -3,3 +3,40 @@ POST http://localhost:10002/actuator/refresh
 
 # 消息总线 - BUS
 两大应用场景：1、配置变更通知，2、自定义消息广播
+
+git 上配置文件的命名规则：${application-name}-${profile}(.yml/.properties)
+spring.cloud.config下的配置：
+label(分支 master): ${spring.cloud.config.label}
+profile(环境 prod/dev): ${spring.cloud.config.profile}
+application(应用名 foodie-user-service): ${spring.cloud.config.name}，默认为
+
+获取配置文件的不同URL姿势，都是GET请求
+http://localhost:20003/master/foodie-user-service-dev.yml
+
+http://localhost:20003/{label}/{application}-{profile}.json
+以上后缀可以换成.yml, .properties，如果不指定{label}的话默认用master
+
+http://localhost:20003/{application}/{profile}/{label}
+如果不指定{label}的话默认用master
+
+在bootstrap.yml中配置encrypt.key以对配置进行对称加密解密
+POST http://localhost:20003/encrypt
+Body中填入文本加密
+POST http://localhost:20003/decrypt
+Body中填入密文加密
+将加密后的文本以形式：'{cipher}3ef28306e9ce9629e95c4c988b149fec5bcf4036881205f473a56552526a305f'
+填入git，config-server拉取后会自动解密
+
+动态刷新配置，spring-cloud-config仅可以对请求实例的单个配置刷新
+1、配置类添加注解：@RefreshScope
+2、放开actuator-endpoint
+3、请求被变更配置的服务，刷新配置
+POST http://localhost:10002/actuator/refresh
+
+BUS：配置变更通知，自定义消息广播
+可将配置中心改为BUS以对所有节点服务进行配置刷新，需在服务端和客户端中加入mq的配置
+请求BUS-SERVER或任意节点以刷新所有节点（可指定destination来只让部分节点刷新配置）
+POST http://localhost:10002/actuator/bus-refresh
+
+
+
