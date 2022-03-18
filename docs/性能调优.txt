@@ -1,0 +1,54 @@
+性能调优四板斧：
+1、借助监控预防问题、发现问题
+2、借助工具定位问题
+3、定期复盘，防止问题重复发生
+4、定好规范规避问题
+
+性能调优章节内容：应用性能调优、JVM调优、数据库调优、架构调优、操作系统调优
+
+监控工具：skywalking
+skywalking：适用于分布式系统的性能监控工具
+官网地址：https://skywalking.apache.org/
+官方文档：https://skywalking.apache.org/docs/main/latest/readme/
+中文文档：https://www.itmuch.com/books/skywalking/
+提供的功能：分布式跟踪和上下文传播、数据库访问指标、告警
+
+安装
+最新版本下载页：https://skywalking.apache.org/downloads/
+后端和UI下载Foundations中SkyWalking APM，监控下载agents中Java Agent，选择distribution
+8.9.1下载地址：https://dlcdn.apache.org/skywalking/8.9.1/apache-skywalking-apm-8.9.1.tar.gz
+skywalking端口占用：11800-gRPC, 12800-http, 8080-UI
+需要jdk8+,解压即可
+
+启动
+bin/startup.sh
+
+使用
+Java服务需要使用Java agent来上报监控数据到skywalking，所以在启动服务的机器上需要部署Java agent，多个服务可共用一个agent
+1、准备Java agent
+下载解压java agent，编辑skywalking-agent/config/agent.config
+agent.service_name=foodie-cloud
+collector.backend_service=192.168.3.26:11800
+2、启动服务，在JVM参数中添加-javaagent:${path}/skywalking-agent/skywalking-agent.jar (并且确保这个参数在-jar参数之前)
+3、调用服务接口，访问skywalking UI进行查看：http://192.168.3.26:8080，其中追踪界面比较重要
+
+架构
+skywalking支持多种监控数据收集方式，Tracing(跟踪java agent), Metrics(采集 Service Mesh), logging, Event Detector
+通过kafka、gRPC、rest-api等方式上报给skywalking receiver cluster
+skywalking UI和Backend使用http端口12800用GraphQL交互
+skywalking支持多种存储方式，默认为H2内嵌式数据库，还支持ES、mysql、TIDB等
+
+java agent配置方式
+配置项参考中文文档：https://www.itmuch.com/books/skywalking/setup/service-agent/java-agent/
+配置文件：skywalking-agent/config/agent.config
+系统属性：启动加上JVM参数-Dskywalking.${参数=值}例如：-Dskywalking.collector.backend_service=192.168.3.26:11800
+代理选项：-javaagent:${path}/skywalking-agent/skywalking-agent.jar=${key1=value1},${key2=value2}
+系统环境变量：在环境变量中配置${SW_AGENT_COLLECTOR_BACKEND_SERVICES}
+优先级：代理选项>系统属性>系统环境变量>配置文件
+
+
+
+
+
+
+
