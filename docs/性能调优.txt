@@ -46,6 +46,70 @@ java agent配置方式
 系统环境变量：在环境变量中配置${SW_AGENT_COLLECTOR_BACKEND_SERVICES}
 优先级：代理选项>系统属性>系统环境变量>配置文件
 
+java agent配置实战
+1、设置采样 (意义：默认情况下所有监控数据都会上报，高并发情况下会影响性能。zipkin也有类似配置采样率)
+agent.sample_n_per_3_secs=${SW_AGENT_SAMPLE:-1}
+agent.sample_n_per_3_secs为负数或0表示不采样，默认为-1不采样。否则表示每3秒采样的条数，若对服务性能影响不大可不设置采样全部上报。
+2、打印SQL详情，包括参数
+plugin.jdbc.trace_sql_parameters=${SW_JDBC_TRACE_SQL_PARAMETERS:false}
+如果设置为true, SQL查询(典型的是 java.sql.PreparedStatement)的参数也会被采集
+plugin.jdbc.sql_parameters_max_length=${SW_PLUGIN_JDBC_SQL_PARAMETERS_MAX_LENGTH:512}
+如果设置为正整数, 收集的SQL参数db.sql.parameters会被截断到这个长度, 否则会被完整保存, 这可能会导致性能问题
+
+java agent插件
+内置插件，对当前主流框架的支持：skywalking-agent/plugins/
+引导插件：skywalking-agent/bootstrap-plugins/
+可选插件：skywalking-agent/optional-plugins/
+默认启用内置插件，添加或移除插件只需把jar移除或移进plugins目录
+插件扩展：
+1、可将链路追踪监控细化到每个bean，激活插件即可用：apm-spring-annotation-plugin (optional-plugins)
+2、监控进一步细化，监控方法中任意代码：apm-customize-enhance-plugin (optional-plugins)
+①激活插件
+②在xml中配置增强规则
+vim customize_enhance.xml
+文档地址：
+https://www.itmuch.com/books/skywalking/setup/service-agent/java-agent/Customize-enhance-trace.html
+https://skywalking.apache.org/docs/skywalking-java/latest/en/setup/service-agent/java-agent/customize-enhance-trace/#support-custom-enhance
+配置如下内容：
+<?xml version="1.0" encoding="UTF-8"?>
+<enhanced>
+    <class class_name="org.apache.commons.lang3.StringUtils">
+        <method method="isBlank(java.lang.CharSequence)" operation_name="/StringUtils-isBlank" static="true">
+            <tag key="arg[0]">arg[0]</tag>
+            <tag key="returnedObj">returnedObj</tag>
+        </method>
+    </class>
+</enhanced>
+配置	                   说明
+class_name	           要被增强的类，注意该类需要为方法定义的类而非调用方法的类。
+method	               类的拦截器方法，参数之间不可添加空格
+operation_name	       即UI上的端点。如果进行了配置，将用它替代默认
+operation_name_suffix  表示在operation_name后添加动态数据后缀
+static	               方法是否为静态方法
+tag	                   将在local span中添加一个tag。key的值需要在XML节点上表示。
+log	                   将在local span中添加一个log。key的值需要在XML节点上表示。
+arg[x]	               表示输入的参数值。比如args[0]表示第一个参数。
+.[x]	               当正在被解析的对象是Array或List，你可以用这个表达式得到对应index上的对象。
+.['key']	           当正在被解析的对象是Map, 你可以用这个表达式得到map的key。
+③在agent.config中配置plugin.customize.enhance_file，指明增强规则文件路径
+自定义插件开发：
+https://blog.csdn.net/lt326030434/article/details/107149727
+
+skywalking存储
+修改存储方式，编辑配置文件
+vim skywalking/config/application.yml
+修改存储类型参数
+storage.selector
+
+告警
+自定义告警与Webhook告警推送，文档地址：https://www.itmuch.com/books/skywalking/setup/backend/backend-alarm.html
+
+动态参数配置
+文档地址：https://www.itmuch.com/books/skywalking/setup/backend/dynamic-config.html
+需要额外的配置服务器，如nacos
+https://nacos.io/zh-cn/docs/quick-start.html
+
+
 
 
 

@@ -31,11 +31,11 @@ public class MyOrderController extends BaseController {
             @ApiParam(name = "userId", value = "用户ID", required = true)
             @RequestParam String userId,
             @ApiParam(name = "orderStatus", value = "订单状态")
-            @RequestParam Integer orderStatus,
+            @RequestParam(required = false) Integer orderStatus,
             @ApiParam(name = "page", value = "页码")
-            @RequestParam Integer page,
+            @RequestParam(required = false) Integer page,
             @ApiParam(name = "pageSize", value = "每页记录数")
-            @RequestParam Integer pageSize) {
+            @RequestParam(required = false) Integer pageSize) {
         if (StringUtils.isBlank(userId)) {
             return Result.errorMsg("用户ID为空");
         }
