@@ -1,3 +1,6 @@
+server:
+  port: 20004
+
 spring:
   application:
     name: gateway-platform
@@ -45,18 +48,13 @@ spring:
     sampler:
       probability: 1
 
-server:
-  port: 20004
-
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://192.168.3.26:20000/eureka/
+      defaultZone: http://127.0.0.1:20000/eureka/
 
 ## 开启所有actuator-endpoint
 management:
-  security:
-    enabled: false
   endpoints:
     web:
       exposure:

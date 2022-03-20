@@ -22,12 +22,10 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://192.168.3.26:20000/eureka/
+      defaultZone: http://127.0.0.1:20000/eureka/
 
 ## 开启所有actuator-endpoint
 management:
-  security:
-    enabled: false
   endpoints:
     web:
       exposure:

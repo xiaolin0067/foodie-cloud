@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: spring-boot-admin-server
+
+server:
+  port: 20006
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:20000/eureka/
+
+management:
+  endpoint:
+    health:
+      show-details: always           # 查看详情
+  endpoints:
+    web:
+      exposure:
+        include: '*'                 # 开放所有监控端点

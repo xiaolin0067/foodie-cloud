@@ -6,7 +6,7 @@
 
 性能调优章节内容：应用性能调优、JVM调优、数据库调优、架构调优、操作系统调优
 
-监控工具：skywalking
+一、监控工具：skywalking
 skywalking：适用于分布式系统的性能监控工具
 官网地址：https://skywalking.apache.org/
 官方文档：https://skywalking.apache.org/docs/main/latest/readme/
@@ -27,9 +27,9 @@ bin/startup.sh
 Java服务需要使用Java agent来上报监控数据到skywalking，所以在启动服务的机器上需要部署Java agent，多个服务可共用一个agent
 1、准备Java agent
 下载解压java agent，编辑skywalking-agent/config/agent.config
-agent.service_name=foodie-cloud
 collector.backend_service=192.168.3.26:11800
-2、启动服务，在JVM参数中添加-javaagent:${path}/skywalking-agent/skywalking-agent.jar (并且确保这个参数在-jar参数之前)
+2、启动服务，在JVM参数中添加如下内容，并且确保这个参数在-jar参数之前
+-javaagent:${path}/skywalking-agent/skywalking-agent.jar=agent.service_name=服务名
 3、调用服务接口，访问skywalking UI进行查看：http://192.168.3.26:8080，其中追踪界面比较重要
 
 架构
@@ -105,9 +105,91 @@ storage.selector
 自定义告警与Webhook告警推送，文档地址：https://www.itmuch.com/books/skywalking/setup/backend/backend-alarm.html
 
 动态参数配置
+可动态配置部分参数，如自定义告警
 文档地址：https://www.itmuch.com/books/skywalking/setup/backend/dynamic-config.html
 需要额外的配置服务器，如nacos
 https://nacos.io/zh-cn/docs/quick-start.html
+
+二、监控工具：spring boot actuator
+官方文档：https://docs.spring.io/spring-boot/docs/2.0.x/actuator-api/html/
+安装，项目添加依赖即可
+<!-- spring boot actuator监控 -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+配置，在项目配置文件中添加
+management:
+  endpoint:
+    health:
+      show-details: always           # 查看详情
+  endpoints:
+    web:
+      exposure:
+        include: '*'                 # 开放所有监控端点，默认只有heal,info是开启的
+注：在以前的1.5.x版本使用：management.security.enabled=false来开放所有端点
+启动项目后会打印日志： Exposing 15 endpoint(s) beneath base path '/actuator'
+使用
+查看所有激活端点
+GET http://localhost:8088/actuator
+健康检查
+GET http://localhost:8088/actuator/health
+其中status枚举：UP 正常，DOWN 不正常，OUT-OF-SERVICE 资源未在使用或不应该使用，UNKNOWN 未知
+健康检查：即检查当前应用使用的资源状态，如mysql、redis、磁盘空间
+自定义健康检查项：实现 AbstractHealthIndicator ，实现doHealthCheck方法
+查看信息
+GET http://localhost:8088/actuator/info
+用户返回项目描述信息，在配置文件中配置的key-val将会被返回，如
+info:
+  project-name: foodie-dev
+  owner-email: test@test.com
+一般用于告警类工具获取项目信息
+查看当前spring管理所有的bean
+GET http://localhost:8088/actuator/beans
+查看当前所有配置属性
+GET http://localhost:8088/actuator/configprops
+查看metrics监控列表
+GET http://localhost:8088/actuator/metrics
+获取metrics具体监控项的值，如system.cpu.count
+GET http://localhost:8088/actuator/metrics/system.cpu.count
+使用loggers修改日志级别
+curl 'http://localhost:8080/actuator/loggers/ROOT' -i -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{"configuredLevel":"debug"}'
+
+spring boot actuator可视化：SpringBootAdmin
+官方地址：https://github.com/codecentric/spring-boot-admin
+文档：https://codecentric.github.io/spring-boot-admin/2.5.1/
+使用：创建SpringBootAdmin server应用并注册到注册中心，浏览器访问admin-server
+注册中心中其他微服务需开启actuator端点
+
+老牌监控工具（界面较丑功能强大）：JavaMelody
+官方文档：https://github.com/javamelody/javamelody
+使用：给项目添加依赖，修改项目配置，浏览器访问：http://localhost:10002/monitoring
+github提Issues步骤/经验：
+1、描述问题
+2、提供复现步骤
+3、附带代码，可直接为GitHub地址
+4、@项目贡献者(contributors)
+
+Tomcat服务器监控工具（仅可用于传统Tomcat服务器方式使用，不可用于springboot）：Tomcat Manager、PSI probe
+Tomcat Manager使用，编辑conf/tomcat-users.xml，填入如下内容
+  <role rolename="manager-gui"/>
+  <role rolename="manager-script"/>
+  <role rolename="manager-jmx"/>
+  <role rolename="manager-status"/>
+  <user username="admin" password="123456" roles="manager-gui,manager-script,manager-jmx,manager-status"/>
+开启允许远程访问
+
+总结：
+仅支持传统Tomcat服务器：TomcatManager、PSIProbe
+都支持：
+Skywalking、SpringbootActuator+SpringBootAdmin、JavaMelody
+ELK、Sleuth+Zipkin、Hystrix+Dashboard、Sentinel+Dashboard
+
+
+
+
 
 
 
