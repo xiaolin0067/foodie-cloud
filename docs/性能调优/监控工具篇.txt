@@ -20,6 +20,9 @@ skywalking：适用于分布式系统的性能监控工具
 skywalking端口占用：11800-gRPC, 12800-http, 8080-UI
 需要jdk8+,解压即可
 
+修改web默认端口
+skywalking-server/webapp/webapp.yml
+
 启动
 bin/startup.sh
 
@@ -31,6 +34,7 @@ collector.backend_service=192.168.3.26:11800
 2、启动服务，在JVM参数中添加如下内容，并且确保这个参数在-jar参数之前
 -javaagent:${path}/skywalking-agent/skywalking-agent.jar=agent.service_name=服务名
 3、调用服务接口，访问skywalking UI进行查看：http://192.168.3.26:8080，其中追踪界面比较重要
+一般配置：-javaagent:/skywalking-agent/skywalking-agent.jar=collector.backend_service=10.206.49.18:11800,agent.service_name=appName,logging.file_name=appName_skywalking.log
 
 架构
 skywalking支持多种监控数据收集方式，Tracing(跟踪java agent), Metrics(采集 Service Mesh), logging, Event Detector
