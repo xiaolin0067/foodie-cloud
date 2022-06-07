@@ -116,6 +116,9 @@ https://nacos.io/zh-cn/docs/quick-start.html
 
 二、监控工具：spring boot actuator
 官方文档：https://docs.spring.io/spring-boot/docs/2.0.x/actuator-api/html/
+自定义指标：
+  https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#actuator.metrics.supported.redis
+  https://lettuce.io/core/6.1.8.RELEASE/reference/index.html#observability
 安装，项目添加依赖即可
 <!-- spring boot actuator监控 -->
 <dependency>
